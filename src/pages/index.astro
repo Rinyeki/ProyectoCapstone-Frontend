@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout>
+	<div class="input input-lg flex max-w-sm space-x-4">
+	<span class="icon-[tabler--search] text-base-content/80 my-auto size-6 shrink-0"></span>
+	<input type="search" class="grow" placeholder="Search" id="kbdInput" />
+	<label class="sr-only" for="kbdInput">Search</label>
+	<span class="my-auto flex gap-3">
+		<kbd class="kbd kbd-sm">⌘</kbd>
+		<kbd class="kbd kbd-sm">K</kbd>
+	</span>
+	</div>
+</Layout>
