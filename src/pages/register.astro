@@ -1,22 +1,20 @@
 ---
 import Navbar from "../components/Navbar.jsx";
-import HomeApp from "../components/HomeApp.jsx";
+import RegisterForm from "../components/RegisterForm.jsx";
 import RutModal from "../components/RutModal.jsx";
 ---
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Inicio</title>
+    <title>Registro</title>
     <style is:global>@import '../styles/app.css';</style>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
   <body class="min-h-screen bg-base-200">
     <Navbar client:load />
     <main class="container mx-auto p-4">
-      <HomeApp client:load />
+      <RegisterForm client:load />
     </main>
     <RutModal client:load />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   </body>
 </html>

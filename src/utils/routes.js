@@ -1,4 +1,4 @@
-export const API_URL = 'http://localhost:3000'
+export const API_URL = ''
 // Rutas Auth y login 
 export const AUTH_LOGIN = `${API_URL}/auth/login`
 export const AUTH_GOOGLE = `${API_URL}/auth/google`
@@ -11,7 +11,7 @@ export const AUTH_UPDATE_NAME = `${API_URL}/auth/update-name`
 export const AUTH_SET_RUT = `${API_URL}/auth/set-rut`
 
 // Rutas Usuarios
-export const USERS_GET = `${API_URL}/users`
+export const USERS_GET = `${API_URL}/usuarios`
 export const USUARIOS_ID = (id) => `${API_URL}/usuarios/${id}`;
 export const USUARIOS_ID_FILTROS = (id) => `${API_URL}/usuarios/${id}/con-filtros`;
 export const USUARIOS_ID_PYMES = (id) => `${API_URL}/usuarios/${id}/pymes`;
