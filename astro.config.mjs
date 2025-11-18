@@ -8,7 +8,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
     server: {
       proxy: {
-        '/auth': 'http://localhost:3000',
+        '/auth': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          bypass: (req) => {
+            if (req.url && req.url.startsWith('/auth/google/callback')) {
+              return false
+            }
+          },
+        },
         '/usuarios': 'http://localhost:3000',
         '/pymes': 'http://localhost:3000',
         '/health': 'http://localhost:3000',
