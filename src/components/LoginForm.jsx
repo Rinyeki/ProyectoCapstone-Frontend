@@ -13,7 +13,7 @@ export default function LoginForm() {
         const data = e.data || {}
         if (data && data.type === 'auth' && data.token) {
           localStorage.setItem('token', data.token)
-          if (data.requiresRut) localStorage.setItem('requiresRut', String(data.requiresRut))
+          if (data.requiresRut === true) localStorage.setItem('requiresRut', 'true'); else localStorage.removeItem('requiresRut')
           window.location.href = '/'
         }
       } catch {}
@@ -29,7 +29,7 @@ export default function LoginForm() {
       setError('')
       const res = await login(correo, contraseña)
       localStorage.setItem('token', res.token)
-      if (res.requiresRut) localStorage.setItem('requiresRut', 'true')
+      if (res.requiresRut === true) localStorage.setItem('requiresRut', 'true'); else localStorage.removeItem('requiresRut')
       window.location.href = '/'
     } catch (e2) {
       setError(e2.message || 'Error')

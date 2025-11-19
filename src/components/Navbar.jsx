@@ -39,7 +39,7 @@ export default function Navbar() {
       <div className="flex-none gap-2">
         {user ? (
           <>
-            <span className="btn btn-ghost">Hola, {user.nombre || user.correo || 'Usuario'}</span>
+            <a href="/perfil" className="btn btn-ghost">Hola, {user.nombre || user.correo || 'Usuario'}</a>
             <a href="/pymes/new" className="btn">Registrar Pyme</a>
             <button className="btn btn-outline" onClick={logout}>Cerrar sesión</button>
           </>

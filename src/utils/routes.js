@@ -1,4 +1,4 @@
-export const API_URL = ''
+export const API_URL = 'http://localhost:3000'
 // Rutas Auth y login 
 export const AUTH_LOGIN = `${API_URL}/auth/login`
 export const AUTH_GOOGLE = `${API_URL}/auth/google`

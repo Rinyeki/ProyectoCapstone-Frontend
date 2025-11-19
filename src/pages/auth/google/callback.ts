@@ -8,11 +8,11 @@ export async function GET() {
       var res = await fetch(fetchUrl, { headers: { Accept: 'application/json' } });
       var data = await res.json();
       if (data && data.token) localStorage.setItem('token', data.token);
-      if (data && data.requiresRut != null) localStorage.setItem('requiresRut', String(data.requiresRut));
+      if (data && data.requiresRut === true) localStorage.setItem('requiresRut', 'true'); else localStorage.removeItem('requiresRut');
       if (window.opener) {
         try {
           if (data && data.token) window.opener.localStorage.setItem('token', data.token);
-          if (data && data.requiresRut != null) window.opener.localStorage.setItem('requiresRut', String(data.requiresRut));
+          if (data && data.requiresRut === true) window.opener.localStorage.setItem('requiresRut', 'true'); else window.opener.localStorage.removeItem('requiresRut');
         } catch(e) {}
         try { window.opener.postMessage({ type: 'auth', token: data && data.token, requiresRut: data && data.requiresRut }, '*'); } catch(e) {}
         try {
