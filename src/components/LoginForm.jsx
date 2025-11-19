@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { login, authGoogleUrl } from '../utils/fetch.js'
 
 export default function LoginForm() {
@@ -6,6 +6,21 @@ export default function LoginForm() {
   const [contraseña, setContraseña] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const onMessage = (e) => {
+      try {
+        const data = e.data || {}
+        if (data && data.type === 'auth' && data.token) {
+          localStorage.setItem('token', data.token)
+          if (data.requiresRut) localStorage.setItem('requiresRut', String(data.requiresRut))
+          window.location.href = '/'
+        }
+      } catch {}
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
 
   const submit = async (e) => {
     e.preventDefault()

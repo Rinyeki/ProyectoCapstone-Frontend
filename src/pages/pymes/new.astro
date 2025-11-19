@@ -1,20 +1,24 @@
 ---
+// c:\Users\Rinyeki\Documents\GitHub\ProyectoCapstone-Frontend\src\pages\pymes\new.astro
 import Navbar from "../../components/Navbar.jsx";
-import PymeForm from "../../components/PymeForm.jsx";
+import NewPymeForm from "../../components/NewPymeForm.jsx";
 import RutModal from "../../components/RutModal.jsx";
 ---
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nueva Pyme</title>
+    <title>Registrar Pyme</title>
     <style is:global>@import '../../styles/app.css';</style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
   <body class="min-h-screen bg-base-200">
     <Navbar client:load />
     <main class="container mx-auto p-4">
-      <PymeForm client:load />
+      <div class="card bg-base-100 shadow p-6">
+        <h1 class="text-2xl font-semibold mb-4">Registrar Pyme</h1>
+        <NewPymeForm client:load />
+      </div>
     </main>
     <RutModal client:load />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>

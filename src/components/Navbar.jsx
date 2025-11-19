@@ -40,7 +40,7 @@ export default function Navbar() {
         {user ? (
           <>
             <span className="btn btn-ghost">Hola, {user.nombre || user.correo || 'Usuario'}</span>
-            {user.rut_chileno ? <a href="/pymes/new" className="btn">Registrar Pyme</a> : null}
+            <a href="/pymes/new" className="btn">Registrar Pyme</a>
             <button className="btn btn-outline" onClick={logout}>Cerrar sesión</button>
           </>
         ) : (
