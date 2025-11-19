@@ -1,4 +1,3 @@
-// c:\Users\Rinyeki\Documents\GitHub\ProyectoCapstone-Frontend\src\components\NewPymeForm.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import { createPyme, getUsuario } from '../utils/fetch.js'
 
@@ -29,8 +28,8 @@ export default function NewPymeForm() {
   const [userRut, setUserRut] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [ok, setOk] = useState(false)
   const [toast, setToast] = useState({ show:false, type:'success', msg:'' })
+  const [dragIdx, setDragIdx] = useState(null)
 
   useEffect(() => {
     const fetchRut = async () => {
@@ -210,7 +209,9 @@ export default function NewPymeForm() {
         </div>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {imagenes.map((src,i)=>(
-            <div key={i} className="relative group">
+            <div key={i} className="relative group" draggable onDragStart={()=>setDragIdx(i)} onDragOver={(e)=>e.preventDefault()} onDrop={()=>{
+              if (dragIdx===null || dragIdx===i) return; const arr=[...imagenes]; const [m]=arr.splice(dragIdx,1); arr.splice(i,0,m); setImagenes(arr); setDragIdx(null)
+            }}>
               <img src={src} alt="preview" className="rounded-box h-24 w-full object-cover" />
               <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
                 <button type="button" className="btn btn-xs" onClick={()=>{

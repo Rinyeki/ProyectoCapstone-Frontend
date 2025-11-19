@@ -21,6 +21,7 @@ export default function PerfilClient() {
   const mapRef = useRef(null)
   const markerRef = useRef(null)
   const [toast, setToast] = useState({ show: false, type: 'success', msg: '' })
+  const [dragIdx, setDragIdx] = useState(null)
 
   useEffect(() => {
     const t = localStorage.getItem('token') || ''
@@ -127,6 +128,14 @@ export default function PerfilClient() {
     const arr = Array.isArray(activePyme?.imagenes_url) ? [...activePyme.imagenes_url] : []
     arr.splice(i,1)
     updateActive('imagenes_url', arr)
+  }
+  function onDropImage(i) {
+    if (dragIdx === null || dragIdx === i) return
+    const arr = Array.isArray(activePyme?.imagenes_url) ? [...activePyme.imagenes_url] : []
+    const [m] = arr.splice(dragIdx, 1)
+    arr.splice(i, 0, m)
+    updateActive('imagenes_url', arr)
+    setDragIdx(null)
   }
 
   function guardarPyme() {
@@ -260,7 +269,7 @@ export default function PerfilClient() {
               </div>
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {(Array.isArray(activePyme.imagenes_url)?activePyme.imagenes_url:[]).map((src,i)=>(
-                  <div key={i} className="relative group">
+                  <div key={i} className="relative group" draggable onDragStart={()=>setDragIdx(i)} onDragOver={(e)=>e.preventDefault()} onDrop={()=>onDropImage(i)}>
                     <img src={src} alt="preview" className="rounded-box h-24 w-full object-cover" />
                     <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
                       <button type="button" className="btn btn-xs" onClick={()=>moveImage(i,'up')}>↑</button>
@@ -280,7 +289,13 @@ export default function PerfilClient() {
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="form-control">
                 <label className="label"><span className="label-text">Etiqueta principal</span></label>
-                <select className="select select-bordered" value={(Array.isArray(activePyme.tipo_servicio)&&activePyme.tipo_servicio[0])||''} onChange={(e)=>updateActive('tipo_servicio', e.target.value ? [e.target.value] : [])}>
+                <select className="select select-bordered" value={(Array.isArray(activePyme.etiquetas)&&activePyme.etiquetas[0])||((Array.isArray(activePyme.tipo_servicio)&&activePyme.tipo_servicio[0])||'')} onChange={(e)=>{
+                  const val = e.target.value
+                  updateActive('tipo_servicio', val ? [val] : [])
+                  const current = Array.isArray(activePyme.etiquetas)?activePyme.etiquetas:[]
+                  const rest = current.filter(v=>v!==val)
+                  updateActive('etiquetas', val ? [val, ...rest] : rest)
+                }}>
                   <option value="">Sin etiqueta</option>
                   {TAGS_MAIN.map(t => (<option key={t} value={t}>{t}</option>))}
                 </select>
@@ -304,10 +319,27 @@ export default function PerfilClient() {
               <div className="flex flex-wrap gap-2">
                 {TAGS_MAIN.map(t => {
                   const current = Array.isArray(activePyme.etiquetas)?activePyme.etiquetas:[]
+                  const principal = current[0]
+                  const rest = current.slice(1)
                   const selected = current.includes(t)
                   return (
                     <button key={t} type="button" className={`btn ${selected?'btn-primary':'btn-outline'}`} onClick={() => {
-                      const next = selected ? current.filter(v=>v!==t) : [...current, t]
+                      let nextPrincipal = principal
+                      let nextRest = [...rest]
+                      if (selected) {
+                        if (t === principal) {
+                          nextPrincipal = ''
+                        } else {
+                          nextRest = nextRest.filter(v=>v!==t)
+                        }
+                      } else {
+                        if (!principal) {
+                          nextPrincipal = t
+                        } else if (t !== principal) {
+                          nextRest = [...nextRest.filter(v=>v!==t), t]
+                        }
+                      }
+                      const next = nextPrincipal ? [nextPrincipal, ...nextRest] : nextRest
                       updateActive('etiquetas', next)
                     }}>{t}</button>
                   )
@@ -317,10 +349,13 @@ export default function PerfilClient() {
 
             <div className="mt-4">
               <label className="label"><span className="label-text">Etiquetas personalizadas</span></label>
-              <input className="input input-bordered" value={(Array.isArray(activePyme.etiquetas)?activePyme.etiquetas:[]).filter(t=>!TAGS_MAIN.includes(t)).join(', ')} onChange={e => {
-                const main = (Array.isArray(activePyme.etiquetas)?activePyme.etiquetas:[]).filter(t=>TAGS_MAIN.includes(t))
+              <input className="input input-bordered" value={(Array.isArray(activePyme.etiquetas)?activePyme.etiquetas:[]).slice(1).filter(t=>!TAGS_MAIN.includes(t)).join(', ')} onChange={e => {
+                const current = Array.isArray(activePyme.etiquetas)?activePyme.etiquetas:[]
+                const principal = current[0]
+                const mainExtras = current.slice(1).filter(t=>TAGS_MAIN.includes(t))
                 const custom = e.target.value.split(',').map(s=>s.trim()).filter(Boolean)
-                updateActive('etiquetas', [...main, ...custom])
+                const next = principal ? [principal, ...mainExtras, ...custom] : [...mainExtras, ...custom]
+                updateActive('etiquetas', next)
               }} placeholder="Estilo coreano, Repostería creativa" />
             </div>
 

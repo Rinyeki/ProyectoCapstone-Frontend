@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
+import * as palette from '../utils/palette.js'
 
-export default function MapLeaflet({ points = [], center, onSelect }) {
+export default function MapLeaflet({ points = [], center, comunaFilter, onSelect }) {
   const ref = useRef(null)
   const mapRef = useRef(null)
   const layerRef = useRef(null)
@@ -27,11 +28,15 @@ export default function MapLeaflet({ points = [], center, onSelect }) {
     if (!map || !window.L || !layer) return
     layer.clearLayers()
     points.forEach((p) => {
+      if (comunaFilter && p.comuna && p.comuna !== comunaFilter) return
       const s = String(p.longitud || '')
       const parts = s.split(',').map((v) => Number(v.trim()))
       if (parts.length === 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
         const [lat, lng] = parts
-        const m = window.L.marker([lat, lng]).addTo(layer)
+        const tag = palette.principalFrom(p)
+        const col = palette.colorFor(tag)
+        const halo = window.L.circleMarker([lat, lng], { radius: 11, color: '#fff', weight: 1, opacity: 0.8, fillColor: '#fff', fillOpacity: 0.25 }).addTo(layer)
+        const m = window.L.circleMarker([lat, lng], { radius: 8, color: '#111', weight: 2, opacity: 1, fillColor: col, fillOpacity: 0.9 }).addTo(layer)
         const html = `
 <div class="card bg-base-100 shadow p-2 w-64">
   <div class="font-semibold">${(p.nombre||'Pyme')}</div>
@@ -44,7 +49,7 @@ export default function MapLeaflet({ points = [], center, onSelect }) {
         })
       }
     })
-  }, [points, onSelect])
+  }, [points, comunaFilter, onSelect])
 
   useEffect(() => {
     const map = mapRef.current
@@ -52,7 +57,6 @@ export default function MapLeaflet({ points = [], center, onSelect }) {
     const [lat, lng] = center
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
       map.setView([lat, lng], 14)
-      window.L.marker([lat, lng]).addTo(map)
     }
   }, [center])
 

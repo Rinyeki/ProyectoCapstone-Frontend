@@ -57,7 +57,7 @@ const COMUNAS = [
   'Peñaflor',
 ]
 
-export default function SearchBar({ onResults, onCenter }) {
+export default function SearchBar({ onResults, onCenter, onFilters }) {
   const [tipoAtencion, setTipoAtencion] = useState([])
   const [comuna, setComuna] = useState('')
   const [tagsMain, setTagsMain] = useState([])
@@ -85,6 +85,7 @@ export default function SearchBar({ onResults, onCenter }) {
       if (tagsMain.length) params.etiquetas = tagsMain
       const data = await listPymes(token, params)
       onResults && onResults(data)
+      onFilters && onFilters({ comuna })
     } catch (e) {
       setError(e.message || 'Error')
       onResults && onResults([])

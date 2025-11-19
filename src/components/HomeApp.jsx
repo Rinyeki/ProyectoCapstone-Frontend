@@ -8,6 +8,7 @@ export default function HomeApp() {
   const [results, setResults] = useState([])
   const [center, setCenter] = useState(null)
   const [selected, setSelected] = useState(null)
+  const [filters, setFilters] = useState({})
   const [page, setPage] = useState(0)
   const pageSize = 9
 
@@ -19,13 +20,13 @@ export default function HomeApp() {
 
   return (
     <div className="space-y-4">
-      <SearchBar onResults={setResults} onCenter={setCenter} />
+      <SearchBar onResults={setResults} onCenter={setCenter} onFilters={setFilters} />
       {selected ? (
         <div className="card bg-base-100 shadow p-4">
           <PymeCard pyme={selected} />
         </div>
       ) : null}
-      <MapLeaflet points={results} center={center} onSelect={setSelected} />
+      <MapLeaflet points={results} center={center} comunaFilter={filters.comuna} onSelect={setSelected} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {results.map((p)=> (<PymeCard key={p.id || p.nombre} pyme={p} />))}
       </div>
