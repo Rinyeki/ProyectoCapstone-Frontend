@@ -20,6 +20,7 @@ export default function PerfilClient() {
   const [searchAddr, setSearchAddr] = useState('')
   const mapRef = useRef(null)
   const markerRef = useRef(null)
+  const [toast, setToast] = useState({ show: false, type: 'success', msg: '' })
 
   useEffect(() => {
     const t = localStorage.getItem('token') || ''
@@ -77,24 +78,32 @@ export default function PerfilClient() {
     setActivePyme(prev => ({ ...(prev || {}), [field]: value }))
   }
 
+  function notify(msg, type='success') { setToast({ show: true, type, msg }); setTimeout(()=> setToast(prev=> ({...prev, show: false})), 3000) }
+
   function actualizarNombre() {
     updateName(token, { nombre: nuevoNombre }).then(res => {
       if (res && res.token) { localStorage.setItem('token', res.token); setToken(res.token) }
-    }).catch(()=>{})
+      notify('Nombre actualizado')
+    }).catch(()=>{ notify('Error al actualizar nombre','error') })
   }
 
   function cambiarPassword() {
-    changePassword(token, { oldPassword: oldPass, newPassword: newPass }).catch(()=>{})
+    changePassword(token, { oldPassword: oldPass, newPassword: newPass })
+      .then(()=> notify('Contraseña actualizada'))
+      .catch(()=> notify('Error al cambiar contraseña','error'))
   }
 
   function solicitarCambioCorreo() {
-    requestEmailChange(token, { nuevo_correo: nuevoCorreo }).catch(()=>{})
+    requestEmailChange(token, { nuevo_correo: nuevoCorreo })
+      .then(()=> notify('Token enviado al correo'))
+      .catch(()=> notify('Error al solicitar token','error'))
   }
 
   function confirmarCambioCorreo() {
     confirmEmailChange(token, { emailToken: tokenCorreo }).then(res => {
       if (res && res.token) { localStorage.setItem('token', res.token); setToken(res.token) }
-    }).catch(()=>{})
+      notify('Correo actualizado')
+    }).catch(()=>{ notify('Error al confirmar token','error') })
   }
 
   function handleFiles(e) {
@@ -107,15 +116,31 @@ export default function PerfilClient() {
       updateActive('imagenes_url', [...current, ...urls])
     })
   }
+  function moveImage(i, dir) {
+    const arr = Array.isArray(activePyme?.imagenes_url) ? [...activePyme.imagenes_url] : []
+    const j = dir === 'up' ? i - 1 : i + 1
+    if (j < 0 || j >= arr.length) return
+    const tmp = arr[j]; arr[j] = arr[i]; arr[i] = tmp
+    updateActive('imagenes_url', arr)
+  }
+  function removeImage(i) {
+    const arr = Array.isArray(activePyme?.imagenes_url) ? [...activePyme.imagenes_url] : []
+    arr.splice(i,1)
+    updateActive('imagenes_url', arr)
+  }
 
   function guardarPyme() {
     if (!activePyme) return
-    updatePyme(token, activePyme.id, activePyme).catch(()=>{})
+    updatePyme(token, activePyme.id, activePyme)
+      .then(()=> notify('Cambios guardados'))
+      .catch(()=> notify('Error al guardar','error'))
   }
 
   function borrarPyme() {
     if (!activePyme) return
-    deletePyme(token, activePyme.id).then(() => { setPymes(prev => prev.filter(x => x.id !== activePyme.id)); setActivePymeId(null); setActivePyme(null) }).catch(()=>{})
+    deletePyme(token, activePyme.id)
+      .then(() => { setPymes(prev => prev.filter(x => x.id !== activePyme.id)); setActivePymeId(null); setActivePyme(null); notify('Pyme eliminada') })
+      .catch(()=> notify('Error al eliminar','error'))
   }
 
   return (
@@ -234,7 +259,16 @@ export default function PerfilClient() {
                 <button type="button" className="btn" onClick={()=>{ const el=document.getElementById('edit-file-input'); el && el.click() }}>Subir imágenes</button>
               </div>
               <div className="mt-2 grid grid-cols-3 gap-2">
-                {(Array.isArray(activePyme.imagenes_url)?activePyme.imagenes_url:[]).map((src,i)=>(<img key={i} src={src} alt="preview" className="rounded-box h-24 w-full object-cover" />))}
+                {(Array.isArray(activePyme.imagenes_url)?activePyme.imagenes_url:[]).map((src,i)=>(
+                  <div key={i} className="relative group">
+                    <img src={src} alt="preview" className="rounded-box h-24 w-full object-cover" />
+                    <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+                      <button type="button" className="btn btn-xs" onClick={()=>moveImage(i,'up')}>↑</button>
+                      <button type="button" className="btn btn-xs" onClick={()=>moveImage(i,'down')}>↓</button>
+                      <button type="button" className="btn btn-xs btn-error" onClick={()=>removeImage(i)}>✕</button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -322,6 +356,13 @@ export default function PerfilClient() {
             <div className="mt-6 flex gap-2">
               <button className="btn btn-primary" onClick={guardarPyme}>Guardar cambios</button>
               <button className="btn btn-outline" onClick={borrarPyme}>Borrar pyme</button>
+            </div>
+          </div>
+        )}
+        {toast.show && (
+          <div className="toast toast-top toast-end">
+            <div className={`alert ${toast.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+              <span>{toast.msg}</span>
             </div>
           </div>
         )}

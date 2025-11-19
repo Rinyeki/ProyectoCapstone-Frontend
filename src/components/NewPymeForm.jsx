@@ -30,6 +30,7 @@ export default function NewPymeForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [ok, setOk] = useState(false)
+  const [toast, setToast] = useState({ show:false, type:'success', msg:'' })
 
   useEffect(() => {
     const fetchRut = async () => {
@@ -84,6 +85,8 @@ export default function NewPymeForm() {
     return () => clearInterval(id)
   }, [])
 
+  const notify = (msg,type='success') => { setToast({ show:true, type, msg }); setTimeout(()=> setToast(prev=>({...prev, show:false})), 3000) }
+
   const submit = async () => {
     try {
       setLoading(true)
@@ -117,10 +120,11 @@ export default function NewPymeForm() {
       }
 
       await createPyme(token, payload)
-      setOk(true)
+      notify('Pyme registrada')
       window.location.href = '/'
     } catch (e) {
       setError(e.message || 'Error')
+      notify(e.message || 'Error al registrar','error')
     } finally {
       setLoading(false)
     }
@@ -205,7 +209,22 @@ export default function NewPymeForm() {
           <button type="button" className="btn" onClick={()=>{ const el=document.getElementById('file-input-hidden'); el && el.click() }}>Subir imágenes</button>
         </div>
         <div className="mt-2 grid grid-cols-3 gap-2">
-          {imagenes.map((src,i)=>(<img key={i} src={src} alt="preview" className="rounded-box h-24 w-full object-cover" />))}
+          {imagenes.map((src,i)=>(
+            <div key={i} className="relative group">
+              <img src={src} alt="preview" className="rounded-box h-24 w-full object-cover" />
+              <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+                <button type="button" className="btn btn-xs" onClick={()=>{
+                  const j = i-1; if (j<0) return; const arr=[...imagenes]; [arr[i],arr[j]]=[arr[j],arr[i]]; setImagenes(arr)
+                }}>↑</button>
+                <button type="button" className="btn btn-xs" onClick={()=>{
+                  const j = i+1; if (j>=imagenes.length) return; const arr=[...imagenes]; [arr[i],arr[j]]=[arr[j],arr[i]]; setImagenes(arr)
+                }}>↓</button>
+                <button type="button" className="btn btn-xs btn-error" onClick={()=>{
+                  const arr=[...imagenes]; arr.splice(i,1); setImagenes(arr)
+                }}>✕</button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -295,7 +314,6 @@ export default function NewPymeForm() {
         <div className="text-error">Debe asignar su RUT antes de crear pymes</div>
       ) : null}
       {error ? <div className="text-error">{error}</div> : null}
-      {ok ? <div className="text-success">Creada</div> : null}
 
       <div className="flex gap-2">
         <button className="btn btn-primary" onClick={submit} disabled={loading || !userRut}>
@@ -305,6 +323,14 @@ export default function NewPymeForm() {
           <button type="button" className="btn" onClick={()=> { localStorage.setItem('requiresRut','true'); window.location.href = window.location.pathname + '?rut=1' }}>Asignar RUT</button>
         ) : null}
       </div>
+
+      {toast.show && (
+        <div className="toast toast-top toast-end">
+          <div className={`alert ${toast.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+            <span>{toast.msg}</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

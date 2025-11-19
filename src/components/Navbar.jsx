@@ -36,18 +36,18 @@ export default function Navbar() {
       <div className="flex-1">
         <a href="/" className="btn btn-ghost text-xl">Capstone</a>
       </div>
-      <div className="flex-none gap-2">
+      <div className="flex-none">
         {user ? (
-          <>
+          <div className="flex items-center gap-3">
             <a href="/perfil" className="btn btn-ghost">Hola, {user.nombre || user.correo || 'Usuario'}</a>
-            <a href="/pymes/new" className="btn">Registrar Pyme</a>
+            <a href="/pymes/new" className="btn btn-secondary">Registrar Pyme</a>
             <button className="btn btn-outline" onClick={logout}>Cerrar sesión</button>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="flex items-center gap-3">
             <a href="/login" className="btn">Login</a>
             <a href="/register" className="btn btn-primary">Registrarse</a>
-          </>
+          </div>
         )}
       </div>
     </div>
