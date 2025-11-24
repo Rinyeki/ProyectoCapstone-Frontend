@@ -90,7 +90,6 @@ export default function NewPymeForm() {
     try {
       setLoading(true)
       setError('')
-      setOk(false)
       const token = localStorage.getItem('token') || ''
       if (!token) throw new Error('Debes iniciar sesión')
 

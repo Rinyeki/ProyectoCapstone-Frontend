@@ -1,4 +1,4 @@
-export const API_URL = 'http://localhost:3000'
+export const API_URL = import.meta.env.VITE_API_URL || 'https://proyecto-capstone.vercel.app'
 // Rutas Auth y login 
 export const AUTH_LOGIN = `${API_URL}/auth/login`
 export const AUTH_GOOGLE = `${API_URL}/auth/google`

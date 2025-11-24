@@ -22,8 +22,13 @@ export default function HomeApp() {
     <div className="space-y-4">
       <SearchBar onResults={setResults} onCenter={setCenter} onFilters={setFilters} />
       {selected ? (
-        <div className="card bg-base-100 shadow p-4">
-          <PymeCard pyme={selected} />
+        <div>
+          <div className="sticky top-2 z-10 flex justify-end pr-2">
+            <button className="btn btn-xs btn-circle" onClick={()=>setSelected(null)}>✕</button>
+          </div>
+          <div className="card bg-base-100 shadow p-4">
+            <PymeCard pyme={selected} />
+          </div>
         </div>
       ) : null}
       <MapLeaflet points={results} center={center} comunaFilter={filters.comuna} onSelect={setSelected} />
