@@ -18,6 +18,18 @@ export default function NewPymeForm() {
   const [imagenes, setImagenes] = useState([])
   const [descripcion, setDescripcion] = useState('')
   const [horario, setHorario] = useState('')
+  const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
+  const [diasSel, setDiasSel] = useState([])
+  const [horaInicio, setHoraInicio] = useState('09:00')
+  const [horaFin, setHoraFin] = useState('18:00')
+  const actualizarHorario = (dias, hi, hf) => {
+    const seleccion = Array.isArray(dias) ? dias : []
+    if (seleccion.length && hi && hf) {
+      setHorario(`${seleccion.join(', ')}, ${hi}-${hf}`)
+    } else {
+      setHorario('')
+    }
+  }
   const [sitioWeb, setSitioWeb] = useState('')
   const [redesMap, setRedesMap] = useState({ instagram:'', facebook:'', twitter:'', tiktok:'' })
   const [etiquetasMain, setEtiquetasMain] = useState([])
@@ -262,7 +274,38 @@ export default function NewPymeForm() {
 
       <div>
         <label className="label">Horario de atención</label>
-        <input className="input input-bordered w-full" value={horario} onChange={(e)=>setHorario(e.target.value)} placeholder="Lunes a Viernes, 9:00 - 18:00" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
+          <div className="md:col-span-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {DIAS.map((d)=> (
+                <label key={d} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={diasSel.includes(d)}
+                    onChange={(e)=> {
+                      const next = e.target.checked ? [...diasSel, d] : diasSel.filter(v=>v!==d)
+                      setDiasSel(next)
+                      actualizarHorario(next, horaInicio, horaFin)
+                    }}
+                  />
+                  <span>{d}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="form-control">
+              <span className="label-text">Hora inicio</span>
+              <input type="time" className="input input-bordered w-full" value={horaInicio} onChange={(e)=> { const v=e.target.value; setHoraInicio(v); actualizarHorario(diasSel, v, horaFin) }} />
+            </div>
+            <div className="form-control">
+              <span className="label-text">Hora cierre</span>
+              <input type="time" className="input input-bordered w-full" value={horaFin} onChange={(e)=> { const v=e.target.value; setHoraFin(v); actualizarHorario(diasSel, horaInicio, v) }} />
+            </div>
+          </div>
+        </div>
+        <div className="text-sm opacity-70 mt-1">Se generará un texto estandarizado como "Lunes, Martes, Miércoles, 09:00-18:00".</div>
       </div>
 
       <div>

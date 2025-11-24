@@ -70,6 +70,9 @@ export default function PymeCard({ pyme }) {
         {pyme.direccion && <p className="text-xs opacity-70">{pyme.direccion}</p>}
         <div className="text-sm">
           <div><span className="font-medium">Tipo atención:</span> {(pyme.tipo_atencion || []).join(', ')}</div>
+          {pyme.horario_atencion ? (
+            <div><span className="font-medium">Horario:</span> {pyme.horario_atencion}</div>
+          ) : null}
           <div><span className="font-medium">Etiquetas:</span> {(() => {
             const et = Array.isArray(pyme.etiquetas) ? pyme.etiquetas : []
             return et.slice(1).join(', ')
