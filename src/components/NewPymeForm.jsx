@@ -24,8 +24,9 @@ export default function NewPymeForm() {
   const [horaFin, setHoraFin] = useState('18:00')
   const actualizarHorario = (dias, hi, hf) => {
     const seleccion = Array.isArray(dias) ? dias : []
-    if (seleccion.length && hi && hf) {
-      setHorario(`${seleccion.join(', ')}, ${hi}-${hf}`)
+    const ordenadas = DIAS.filter(d => seleccion.includes(d))
+    if (ordenadas.length && hi && hf) {
+      setHorario(`${ordenadas.join(', ')}, ${hi}-${hf}`)
     } else {
       setHorario('')
     }
@@ -316,11 +317,12 @@ export default function NewPymeForm() {
       <div>
         <label className="label">Redes</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <input className="input input-bordered" placeholder="Instagram" value={redesMap.instagram} onChange={(e)=>setRedesMap(v=>({ ...v, instagram: e.target.value }))} />
-          <input className="input input-bordered" placeholder="Facebook" value={redesMap.facebook} onChange={(e)=>setRedesMap(v=>({ ...v, facebook: e.target.value }))} />
-          <input className="input input-bordered" placeholder="Twitter" value={redesMap.twitter} onChange={(e)=>setRedesMap(v=>({ ...v, twitter: e.target.value }))} />
-          <input className="input input-bordered" placeholder="TikTok" value={redesMap.tiktok} onChange={(e)=>setRedesMap(v=>({ ...v, tiktok: e.target.value }))} />
+          <input className="input input-bordered" placeholder="https://www.instagram.com/Empresa/" value={redesMap.instagram} onChange={(e)=>setRedesMap(v=>({ ...v, instagram: e.target.value }))} />
+          <input className="input input-bordered" placeholder="https://www.facebook.com/Empresa" value={redesMap.facebook} onChange={(e)=>setRedesMap(v=>({ ...v, facebook: e.target.value }))} />
+          <input className="input input-bordered" placeholder="https://twitter.com/Empresa" value={redesMap.twitter} onChange={(e)=>setRedesMap(v=>({ ...v, twitter: e.target.value }))} />
+          <input className="input input-bordered" placeholder="https://www.tiktok.com/@Empresa" value={redesMap.tiktok} onChange={(e)=>setRedesMap(v=>({ ...v, tiktok: e.target.value }))} />
         </div>
+        <div className="text-sm opacity-70 mt-1">Ingresa el enlace completo, por ejemplo: https://www.instagram.com/Empresa/</div>
       </div>
 
       <div>

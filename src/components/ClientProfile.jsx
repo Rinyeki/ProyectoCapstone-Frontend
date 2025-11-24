@@ -224,9 +224,10 @@ export default function PerfilClient() {
                 <label className="label"><span className="label-text">Descripción</span></label>
                 <textarea className="textarea textarea-bordered" rows={3} value={activePyme.descripcion || ''} onChange={e => updateActive('descripcion', e.target.value)} />
               </div>
-              <div className="form-control">
+              <div className="form-control md:col-span-3">
                 <label className="label"><span className="label-text">Horario de atención</span></label>
-                <input className="input input-bordered" value={activePyme.horario_atencion || ''} onChange={e => updateActive('horario_atencion', e.target.value)} />
+                <ScheduleEditor value={activePyme.horario_atencion || ''} onChange={(v)=> updateActive('horario_atencion', v)} />
+                <div className="text-sm opacity-70 mt-1">Se generará un texto estandarizado como "Lunes, Martes, Miércoles, 09:00-18:00".</div>
               </div>
               <div className="form-control">
                 <label className="label"><span className="label-text">Sitio web</span></label>
@@ -378,14 +379,15 @@ export default function PerfilClient() {
               </div>
             </div>
 
-            <div className="mt-4">
+              <div className="mt-4">
               <label className="label"><span className="label-text">Redes</span></label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <input className="input input-bordered" placeholder="Instagram" value={activePyme.redes?.instagram || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), instagram: e.target.value })} />
-                <input className="input input-bordered" placeholder="Facebook" value={activePyme.redes?.facebook || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), facebook: e.target.value })} />
-                <input className="input input-bordered" placeholder="Twitter" value={activePyme.redes?.twitter || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), twitter: e.target.value })} />
-                <input className="input input-bordered" placeholder="TikTok" value={activePyme.redes?.tiktok || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), tiktok: e.target.value })} />
+                <input className="input input-bordered" placeholder="https://www.instagram.com/Empresa/" value={activePyme.redes?.instagram || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), instagram: e.target.value })} />
+                <input className="input input-bordered" placeholder="https://www.facebook.com/Empresa" value={activePyme.redes?.facebook || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), facebook: e.target.value })} />
+                <input className="input input-bordered" placeholder="https://twitter.com/Empresa" value={activePyme.redes?.twitter || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), twitter: e.target.value })} />
+                <input className="input input-bordered" placeholder="https://www.tiktok.com/@Empresa" value={activePyme.redes?.tiktok || ''} onChange={e => updateActive('redes', { ...(activePyme.redes||{}), tiktok: e.target.value })} />
               </div>
+              <div className="text-sm opacity-70 mt-1">Ingresa el enlace completo, por ejemplo: https://www.instagram.com/Empresa/</div>
             </div>
 
             <div className="mt-6 flex gap-2">
@@ -402,6 +404,63 @@ export default function PerfilClient() {
           </div>
         )}
       </main>
+    </div>
+  )
+}
+
+function ScheduleEditor({ value, onChange }) {
+  const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
+  const [diasSel, setDiasSel] = React.useState([])
+  const [horaInicio, setHoraInicio] = React.useState('09:00')
+  const [horaFin, setHoraFin] = React.useState('18:00')
+  React.useEffect(() => {
+    const raw = String(value || '')
+    const m = raw.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/)
+    if (m) { setHoraInicio(m[1]); setHoraFin(m[2]) }
+    const daysPart = raw.replace(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/, '').replace(/[,\s]+$/,'').trim()
+    const tokens = daysPart.split(',').map(s=>s.trim()).filter(Boolean)
+    const valid = DIAS.filter(d => tokens.some(t => t.toLowerCase().startsWith(d.toLowerCase().slice(0,3))))
+    setDiasSel(valid)
+  }, [value])
+  const actualizar = (sel, hi, hf) => {
+    const ordenadas = DIAS.filter(d => sel.includes(d))
+    if (ordenadas.length && hi && hf) {
+      onChange(`${ordenadas.join(', ')}, ${hi}-${hf}`)
+    } else {
+      onChange('')
+    }
+  }
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
+      <div className="md:col-span-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {DIAS.map((d)=> (
+            <label key={d} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={diasSel.includes(d)}
+                onChange={(e)=> {
+                  const next = e.target.checked ? [...diasSel, d] : diasSel.filter(v=>v!==d)
+                  setDiasSel(next)
+                  actualizar(next, horaInicio, horaFin)
+                }}
+              />
+              <span>{d}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="form-control">
+          <span className="label-text">Hora inicio</span>
+          <input type="time" className="input input-bordered w-full" value={horaInicio} onChange={(e)=> { const v=e.target.value; setHoraInicio(v); actualizar(diasSel, v, horaFin) }} />
+        </div>
+        <div className="form-control">
+          <span className="label-text">Hora cierre</span>
+          <input type="time" className="input input-bordered w-full" value={horaFin} onChange={(e)=> { const v=e.target.value; setHoraFin(v); actualizar(diasSel, horaInicio, v) }} />
+        </div>
+      </div>
     </div>
   )
 }
