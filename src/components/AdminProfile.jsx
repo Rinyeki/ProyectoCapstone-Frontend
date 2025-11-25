@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { listUsuarios, listPymes, updatePyme } from '../utils/fetch.js'
+import { listUsuarios, listPymes, updatePyme, deletePyme, deleteUsuario } from '../utils/fetch.js'
 
 const ATENCION = ['Presencial','A Domicilio','Online']
 const COMUNAS = ['Santiago','Cerrillos','Cerro Navia','Conchalí','El Bosque','Estación Central','Huechuraba','Independencia','La Cisterna','La Florida','La Granja','La Pintana','La Reina','Las Condes','Lo Barnechea','Lo Espejo','Lo Prado','Macul','Maipú','Ñuñoa','Pedro Aguirre Cerda','Peñalolén','Providencia','Pudahuel','Quilicura','Quinta Normal','Recoleta','Renca','San Joaquín','San Miguel','San Ramón','Vitacura','Colina','Lampa','Tiltil','Puente Alto','Pirque','San José de Maipo','San Bernardo','Buin','Paine','Calera de Tango','Melipilla','Curacaví','María Pinto','San Pedro','Alhué','Talagante','El Monte','Isla de Maipo','Padre Hurtado','Peñaflor']
@@ -361,7 +361,27 @@ export default function AdminProfile() {
             </div>
 
             <div className="mt-6">
-              <button className="btn btn-primary" onClick={guardarPyme}>Guardar</button>
+              <div className="flex gap-2">
+                <button className="btn btn-primary" onClick={guardarPyme}>Guardar</button>
+                <button className="btn btn-error" onClick={async ()=>{
+                  try {
+                    if (!activePyme) return
+                    const ok = window.confirm(`¿Eliminar la pyme "${activePyme.nombre}"? Esta acción no se puede deshacer.`)
+                    if (!ok) return
+                    await deletePyme(token, activePyme.id)
+                    notify('Pyme eliminada')
+                    // Recargar lista de pymes de la página actual
+                    const curr = await listPymes(token, { limit: pageSize, offset: page * pageSize })
+                    const arr = Array.isArray(curr) ? curr : []
+                    setPymes(arr)
+                    const first = arr.length ? arr[0] : null
+                    setActivePymeId(first ? first.id : null)
+                    setActivePyme(first || null)
+                  } catch {
+                    notify('Error al eliminar pyme','error')
+                  }
+                }}>Eliminar</button>
+              </div>
             </div>
           </div>
         )}
@@ -375,7 +395,7 @@ export default function AdminProfile() {
             <div className="max-h-96 overflow-auto">
               <table className="table">
                 <thead>
-                  <tr><th>Nombre</th><th>Correo</th><th>Rol</th></tr>
+                  <tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Acciones</th></tr>
                 </thead>
                 <tbody>
                   {(() => {
@@ -386,7 +406,24 @@ export default function AdminProfile() {
                     })
                     const pageUsers = list.slice(uPage * uPageSize, (uPage + 1) * uPageSize)
                     return pageUsers.map(u => (
-                      <tr key={u.id}><td>{u.nombre}</td><td>{u.correo}</td><td>{u.rol}</td></tr>
+                      <tr key={u.id}>
+                        <td>{u.nombre}</td>
+                        <td>{u.correo}</td>
+                        <td>{u.rol}</td>
+                        <td>
+                          <button className="btn btn-xs btn-error" onClick={async()=>{
+                            try {
+                              const ok = window.confirm(`¿Eliminar el usuario "${u.nombre}" y sus pymes asociadas?`)
+                              if (!ok) return
+                              await deleteUsuario(token, u.id)
+                              setUsuarios(prev => prev.filter(x => x.id !== u.id))
+                              notify('Usuario eliminado')
+                            } catch {
+                              notify('Error al eliminar usuario','error')
+                            }
+                          }}>Eliminar</button>
+                        </td>
+                      </tr>
                     ))
                   })()}
                 </tbody>
