@@ -244,7 +244,7 @@ export default function NewPymeForm() {
       <div className="mt-4">
         <label className="label">Ubicación en mapa</label>
         <div id="new-pyme-map" className="w-full h-[300px] rounded-box overflow-hidden" />
-        <div className="text-sm opacity-70 mt-2">Haz clic en el mapa para fijar la ubicación. Se guardará como "lat,lng".</div>
+        <div className="text-sm opacity-70 mt-2">Haz clic en el mapa para fijar la ubicación.</div>
       </div>
 
       <div>
@@ -272,7 +272,7 @@ export default function NewPymeForm() {
         <label className="label">Descripción</label>
         <textarea className="textarea textarea-bordered w-full" rows={3} value={descripcion} onChange={(e)=>setDescripcion(e.target.value)} placeholder="Describe tu pyme" />
       </div>
-
+    
       <div>
         <label className="label">Horario de atención</label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
