@@ -10,22 +10,44 @@ export default function HomeApp() {
   const [selected, setSelected] = useState(null)
   const [filters, setFilters] = useState({})
   const [page, setPage] = useState(0)
+  const [hasNext, setHasNext] = useState(false)
+  const [totalPages, setTotalPages] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const pageSize = 9
 
   useEffect(() => {
-    setLoading(true)
-    setError('')
-    listPymes(undefined, { limit: pageSize, offset: page * pageSize })
-      .then((data)=>{
-        setResults(Array.isArray(data) ? data : [])
-      })
-      .catch((e)=>{
+    let cancelled = false
+    const load = async () => {
+      try {
+        setLoading(true)
+        setError('')
+        const curr = await listPymes(undefined, { limit: pageSize, offset: page * pageSize })
+        const arr = Array.isArray(curr) ? curr : []
+        if (cancelled) return
+        setResults(arr)
+        try {
+          const nxt = await listPymes(undefined, { limit: pageSize, offset: (page+1) * pageSize })
+          const nxtArr = Array.isArray(nxt) ? nxt : []
+          const nextExists = nxtArr.length > 0
+          setHasNext(nextExists)
+          if (!nextExists) setTotalPages(page + 1)
+          else setTotalPages(null)
+        } catch {
+          setHasNext(false)
+          setTotalPages(page + 1)
+        }
+      } catch (e) {
+        if (cancelled) return
         setError(e && e.message ? e.message : 'Error al cargar pymes')
         setResults([])
-      })
-      .finally(()=> setLoading(false))
+        setHasNext(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
   }, [page])
 
   return (
@@ -51,9 +73,12 @@ export default function HomeApp() {
       {error ? (
         <div className="text-center text-error">{error}</div>
       ) : null}
-      <div className="flex justify-center gap-2">
-        <button className="btn" disabled={page === 0} onClick={() => setPage(p => Math.max(0, p - 1))}>Anterior</button>
-        <button className="btn" disabled={results.length < pageSize} onClick={() => setPage(p => p + 1)}>Siguiente</button>
+      <div className="flex items-center gap-3 justify-center">
+        <div className="flex gap-2">
+          <button className="btn" disabled={page === 0} onClick={() => setPage(p => Math.max(0, p - 1))}>Anterior</button>
+          <button className="btn" disabled={!hasNext} onClick={() => setPage(p => p + 1)}>Siguiente</button>
+        </div>
+        <div className="text-sm opacity-70">Página {page+1}{totalPages ? ` / ${totalPages}` : ''}</div>
       </div>
     </div>
   )

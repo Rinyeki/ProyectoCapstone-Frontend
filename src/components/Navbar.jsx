@@ -41,6 +41,8 @@ export default function Navbar() {
         {user ? (
           <div className="flex items-center gap-3">
             <a href="/perfil" className="btn btn-ghost">Hola, {user.nombre || user.correo || 'Usuario'}</a>
+            {user.rol === 'administrador' ? (
+            <a href="/admin" className="btn btn-ghost">Panel Admin</a>) : null}
             <a href="/pymes/new" className="btn btn-secondary">Registrar Pyme</a>
             <button className="btn btn-outline" onClick={logout}>Cerrar sesión</button>
           </div>

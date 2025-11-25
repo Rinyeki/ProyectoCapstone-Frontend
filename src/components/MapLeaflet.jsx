@@ -77,5 +77,5 @@ export default function MapLeaflet({ points = [], center, comunaFilter, onSelect
     }
   }, [center])
 
-  return <div ref={ref} className="w-full h-[400px] rounded-box overflow-hidden" />
+  return <div ref={ref} className="w-full h-[400px] rounded-box overflow-hidden z-0" />
 }
