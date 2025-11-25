@@ -10,12 +10,22 @@ export default function HomeApp() {
   const [selected, setSelected] = useState(null)
   const [filters, setFilters] = useState({})
   const [page, setPage] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const pageSize = 9
 
   useEffect(() => {
-    listPymes(undefined, { limit: pageSize, offset: page * pageSize }).then((data)=>{
-      setResults(Array.isArray(data) ? data : [])
-    }).catch(()=>{})
+    setLoading(true)
+    setError('')
+    listPymes(undefined, { limit: pageSize, offset: page * pageSize })
+      .then((data)=>{
+        setResults(Array.isArray(data) ? data : [])
+      })
+      .catch((e)=>{
+        setError(e && e.message ? e.message : 'Error al cargar pymes')
+        setResults([])
+      })
+      .finally(()=> setLoading(false))
   }, [page])
 
   return (
@@ -35,6 +45,12 @@ export default function HomeApp() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {results.map((p)=> (<PymeCard key={p.id || p.nombre} pyme={p} />))}
       </div>
+      {(!loading && !results.length) ? (
+        <div className="text-center opacity-70">No hay pymes para mostrar</div>
+      ) : null}
+      {error ? (
+        <div className="text-center text-error">{error}</div>
+      ) : null}
       <div className="flex justify-center gap-2">
         <button className="btn" disabled={page === 0} onClick={() => setPage(p => Math.max(0, p - 1))}>Anterior</button>
         <button className="btn" disabled={results.length < pageSize} onClick={() => setPage(p => p + 1)}>Siguiente</button>
