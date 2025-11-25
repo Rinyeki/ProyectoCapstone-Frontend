@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 export default function Navbar() {
   const [user, setUser] = useState(null)
 
+  //Para reconocer el usuario por token
   useEffect(() => {
     const load = () => {
       try {
