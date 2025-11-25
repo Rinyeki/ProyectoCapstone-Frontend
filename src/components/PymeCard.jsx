@@ -38,11 +38,36 @@ function SocialModal({ redes, onClose }) {
   );
 }
 
+function ImagePreviewModal({ images, startIndex = 0, onClose }) {
+  const arr = Array.isArray(images) ? images.filter(Boolean) : []
+  const [i, setI] = useState(Math.min(Math.max(0, startIndex || 0), Math.max(0, arr.length - 1)))
+  useEffect(() => { setI(Math.min(Math.max(0, startIndex || 0), Math.max(0, arr.length - 1))) }, [startIndex, arr.length])
+  const prev = () => setI(p => (p - 1 + arr.length) % arr.length)
+  const next = () => setI(p => (p + 1) % arr.length)
+  if (!arr.length) return null
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-base-content/50 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="relative w-[92vw] max-w-4xl max-h-[88vh]">
+        <img src={arr[i]} alt="" className="w-full max-h-[88vh] object-contain rounded-box bg-base-100" />
+        {arr.length > 1 && (
+          <>
+            <button type="button" onClick={prev} aria-label="Anterior" className="absolute left-2 top-1/2 -translate-y-1/2 bg-base-content/70 text-base-100 rounded-full h-10 w-10 flex items-center justify-center">‹</button>
+            <button type="button" onClick={next} aria-label="Siguiente" className="absolute right-2 top-1/2 -translate-y-1/2 bg-base-content/70 text-base-100 rounded-full h-10 w-10 flex items-center justify-center">›</button>
+          </>
+        )}
+        <button type="button" onClick={onClose} aria-label="Cerrar" className="absolute top-2 right-2 bg-base-content/70 text-base-100 rounded-full h-8 w-8 flex items-center justify-center">✕</button>
+      </div>
+    </div>
+  )
+}
+
 export default function PymeCard({ pyme }) {
   const [showRedes, setShowRedes] = useState(false)
   const imgs = Array.isArray(pyme.imagenes_url) ? pyme.imagenes_url.filter(Boolean) : []
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="%232a2a2a"/><text x="50%" y="50%" fill="%23cccccc" font-size="32" text-anchor="middle" dominant-baseline="middle">Pyme</text></svg>'
   const [idx, setIdx] = useState(0)
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewStart, setPreviewStart] = useState(0)
   useEffect(() => { setIdx(0) }, [imgs.length])
   const prev = () => { if (imgs.length > 1) setIdx(p => (p - 1 + imgs.length) % imgs.length) }
   const next = () => { if (imgs.length > 1) setIdx(p => (p + 1) % imgs.length) }
@@ -51,7 +76,7 @@ export default function PymeCard({ pyme }) {
     <div className="card bg-base-100 shadow">
       <figure className="px-4 pt-4">
         <div className="relative w-full h-40">
-          <img src={current} alt={pyme.nombre || 'Pyme'} className="rounded-box h-40 w-full object-cover" loading="lazy" />
+          <img src={current} alt={pyme.nombre || 'Pyme'} className="rounded-box h-40 w-full object-cover cursor-zoom-in" loading="lazy" onClick={()=>{ if (imgs.length) { setPreviewStart(idx); setShowPreview(true) } }} />
           {imgs.length > 1 && (
             <>
               <button type="button" onClick={prev} aria-label="Anterior" className="absolute left-2 top-1/2 -translate-y-1/2 bg-base-content/50 text-base-100 rounded-full h-8 w-8 flex items-center justify-center">‹</button>
@@ -101,6 +126,7 @@ export default function PymeCard({ pyme }) {
           <button className="btn btn-outline" onClick={() => setShowRedes(v => !v)}>Redes</button>
         </div>
         {showRedes && <SocialModal redes={pyme.redes || {}} onClose={() => setShowRedes(false)} />}
+        {showPreview && <ImagePreviewModal images={imgs.length?imgs:[current]} startIndex={previewStart} onClose={()=> setShowPreview(false)} />}
       </div>
     </div>
   )
