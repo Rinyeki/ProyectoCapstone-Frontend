@@ -35,7 +35,7 @@ export default function Navbar() {
   return (
     <div className="navbar bg-base-100 border-b">
       <div className="flex-1">
-        <a href="/" className="btn btn-ghost text-xl">Capstone</a>
+        <a href="/" className="btn btn-ghost text-xl">PymSearch</a>
       </div>
       <div className="flex-none">
         {user ? (
