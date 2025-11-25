@@ -46,7 +46,7 @@ export default function RegisterForm() {
         <input type="text" className="input input-bordered w-full" value={nombre} onChange={(e) => setNombre(e.target.value)} />
       </label>
       <label className="form-control w-full mb-4">
-        <span className="label-text">RUT (opcional)</span>
+        <span className="label-text">RUT</span>
         <input type="text" className="input input-bordered w-full" placeholder="12345678-K" value={rut} onChange={(e) => setRut(e.target.value)} />
       </label>
       {error ? <div className="text-error mb-3">{error}</div> : null}
