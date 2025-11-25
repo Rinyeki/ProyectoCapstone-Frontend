@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as palette from '../utils/palette.js'
 
 function InstagramIcon() { return (<svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 4a5 5 0 1 0 0 10a5 5 0 0 0 0-10zm6.5-.75a1.25 1.25 0 1 0 0 2.5a1.25 1.25 0 0 0 0-2.5z"/></svg>); }
@@ -40,13 +40,30 @@ function SocialModal({ redes, onClose }) {
 
 export default function PymeCard({ pyme }) {
   const [showRedes, setShowRedes] = useState(false)
-  const imgs = Array.isArray(pyme.imagenes_url) ? pyme.imagenes_url : []
+  const imgs = Array.isArray(pyme.imagenes_url) ? pyme.imagenes_url.filter(Boolean) : []
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="%232a2a2a"/><text x="50%" y="50%" fill="%23cccccc" font-size="32" text-anchor="middle" dominant-baseline="middle">Pyme</text></svg>'
-  const first = imgs[0] || placeholder
+  const [idx, setIdx] = useState(0)
+  useEffect(() => { setIdx(0) }, [imgs.length])
+  const prev = () => { if (imgs.length > 1) setIdx(p => (p - 1 + imgs.length) % imgs.length) }
+  const next = () => { if (imgs.length > 1) setIdx(p => (p + 1) % imgs.length) }
+  const current = imgs.length ? imgs[idx] : placeholder
   return (
     <div className="card bg-base-100 shadow">
       <figure className="px-4 pt-4">
-        <img src={first} alt={pyme.nombre || 'Pyme'} className="rounded-box h-40 w-full object-cover" />
+        <div className="relative w-full h-40">
+          <img src={current} alt={pyme.nombre || 'Pyme'} className="rounded-box h-40 w-full object-cover" loading="lazy" />
+          {imgs.length > 1 && (
+            <>
+              <button type="button" onClick={prev} aria-label="Anterior" className="absolute left-2 top-1/2 -translate-y-1/2 bg-base-content/50 text-base-100 rounded-full h-8 w-8 flex items-center justify-center">‹</button>
+              <button type="button" onClick={next} aria-label="Siguiente" className="absolute right-2 top-1/2 -translate-y-1/2 bg-base-content/50 text-base-100 rounded-full h-8 w-8 flex items-center justify-center">›</button>
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                {imgs.map((_, i) => (
+                  <button key={i} type="button" onClick={() => setIdx(i)} aria-label={`Imagen ${i + 1}`} className={`h-2 w-2 rounded-full ${i === idx ? 'bg-base-100' : 'bg-base-100/50'}`} />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </figure>
       <div className="card-body">
         <div className="flex items-center gap-2">
