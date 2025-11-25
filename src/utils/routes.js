@@ -1,4 +1,9 @@
 export const API_URL = import.meta.env.VITE_API_URL || 'https://proyecto-capstone.vercel.app'
+export const WEB_URL = (
+  import.meta.env.VITE_WEB_URL ||
+  (typeof window !== 'undefined' && window.location && window.location.origin) ||
+  'https://proyecto-capstone-frontend.vercel.app'
+)
 // Rutas Auth y login 
 export const AUTH_LOGIN = `${API_URL}/auth/login`
 export const AUTH_GOOGLE = `${API_URL}/auth/google`

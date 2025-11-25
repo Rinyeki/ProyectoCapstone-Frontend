@@ -59,7 +59,7 @@ async function request(url, { method = 'GET', token, body, query } = {}) {
 }
 
 export function authGoogleUrl() {
-  return AUTH_GOOGLE
+  return `${AUTH_GOOGLE}?front=1`
 }
 
 export function authGoogleCallbackUrl() {
